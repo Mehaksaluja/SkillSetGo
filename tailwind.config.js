@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -23,6 +24,19 @@ export default {
           300: "#e2e8f0",
           400: "#cbd5e1",
           500: "#94a3b8",
+        },
+        dark: {
+          bg: {
+            primary: "#111827",
+            secondary: "#1F2937",
+            tertiary: "#374151",
+          },
+          text: {
+            primary: "#F9FAFB",
+            secondary: "#E5E7EB",
+            tertiary: "#9CA3AF",
+          },
+          border: "#374151",
         },
       },
       keyframes: {

@@ -286,6 +286,24 @@ export default function Home() {
     navigate(`/post-job?edit=${jobId}`);
   };
 
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'Recently';
+    try {
+      // Handle Firestore Timestamp
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const now = new Date();
+      const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+      
+      if (diffInDays === 0) return 'Today';
+      if (diffInDays === 1) return 'Yesterday';
+      if (diffInDays < 7) return `${diffInDays} days ago`;
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Recently';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -400,7 +418,7 @@ export default function Home() {
               ) : filteredJobs.length > 0 ? (
                 <div className="divide-y divide-gray-200">
                   {filteredJobs.map((job) => (
-                    <div key={job.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div key={job.id} className="p-6 hover:bg-blue-50 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">
@@ -415,14 +433,14 @@ export default function Home() {
                             <>
                               <button
                                 onClick={() => handleEditJob(job.id)}
-                                className="p-2 text-blue-600 hover:text-blue-700 rounded-full hover:bg-blue-50"
+                                className="p-2 text-blue-600 hover:text-blue-700 rounded-full hover:bg-blue-100"
                                 title="Edit job"
                               >
                                 <Edit2 className="h-5 w-5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteJob(job.id)}
-                                className="p-2 text-red-600 hover:text-red-700 rounded-full hover:bg-red-50"
+                                className="p-2 text-red-600 hover:text-red-700 rounded-full hover:bg-red-100"
                                 title="Delete job"
                               >
                                 <Trash2 className="h-5 w-5" />
@@ -443,20 +461,20 @@ export default function Home() {
                       </div>
                       <div className="mt-4 flex flex-wrap gap-4">
                         <div className="flex items-center text-gray-600">
-                          <MapPin className="h-4 w-4 mr-1" />
+                          <MapPin className="h-4 w-4 mr-1 text-blue-500" />
                           <span>{job.location}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <Briefcase className="h-4 w-4 mr-1" />
+                          <Briefcase className="h-4 w-4 mr-1 text-blue-500" />
                           <span>{job.type}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <DollarSign className="h-4 w-4 mr-1" />
-                          <span>{job.price}</span>
+                          <DollarSign className="h-4 w-4 mr-1 text-blue-500" />
+                          <span>{job.salary || 'Not specified'}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <Clock className="h-4 w-4 mr-1" />
-                          <span>{job.posted}</span>
+                          <Clock className="h-4 w-4 mr-1 text-blue-500" />
+                          <span>{formatDate(job.createdAt)}</span>
                         </div>
                       </div>
                       <div className="mt-4">
@@ -471,6 +489,14 @@ export default function Home() {
                             {tag}
                           </span>
                         ))}
+                      </div>
+                      <div className="mt-4">
+                        <Link
+                          to={`/jobs/${job.id}`}
+                          className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                        >
+                          View Details
+                        </Link>
                       </div>
                     </div>
                   ))}
