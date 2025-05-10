@@ -4,8 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { useToaster } from '@/components/ui/Toaster';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp, orderBy } from 'firebase/firestore';
-import { CheckCircle, XCircle, Clock, Mail, Phone, User, Briefcase, MapPin, DollarSign } from 'lucide-react';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp, orderBy, deleteDoc } from 'firebase/firestore';
+import { CheckCircle, XCircle, Clock, Mail, Phone, User, Briefcase, MapPin, DollarSign, Trash2 } from 'lucide-react';
 
 export default function ViewApplications() {
   const [jobs, setJobs] = useState([]);
@@ -99,6 +99,20 @@ export default function ViewApplications() {
     }
   };
 
+  const handleDeleteJob = async (jobId) => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        const jobRef = doc(db, 'jobs', jobId);
+        await deleteDoc(jobRef);
+        setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+        addToast('Job deleted successfully', 'success');
+      } catch (error) {
+        console.error('Error deleting job:', error);
+        addToast('Failed to delete job', 'error');
+      }
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'accepted':
@@ -172,7 +186,18 @@ export default function ViewApplications() {
         <div className="space-y-8">
           {jobs.map((job) => (
             <div key={job.id} className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">{job.title}</h2>
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">{job.title}</h2>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleDeleteJob(job.id)}
+                    className="p-2 text-red-600 hover:text-red-700 rounded-full hover:bg-red-50"
+                    title="Delete job"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
               <div className="flex flex-wrap gap-4 text-gray-500 mb-6">
                 <div className="flex items-center">
                   <Briefcase className="h-5 w-5 mr-1" />
